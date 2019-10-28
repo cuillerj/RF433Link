@@ -66,7 +66,9 @@ void RF433Link::SendData(uint8_t *PData, uint8_t dataLen){
 }
 void RF433Link::RetrySend(){
 	if(millis()>_lastSentTime+random(1500,2500) && _retry < _nbRetry ){
+#if defined(debugOn)
 		Serial.println(_retry);
+#endif
 		_retry++;
 		 vw_send((uint8_t *)_outMsg,_outLen);
 		vw_wait_tx(); 
@@ -80,25 +82,32 @@ receivedData RF433Link::Receive(){
 	_inBuflen = VW_MAX_MESSAGE_LEN;
 	receivedData rc;
 	if (vw_get_message(_inBbuf, &_inBuflen)) {
+#if defined(debugOn)
 		Serial.print("RFf In Len:");
 		Serial.print(_inBuflen);
 		Serial.print(" - ");
-		for (int i = 0; i < _inBuflen; i++) {
-		}
+#endif
 		_inRFaddrE = _inBbuf[0];
 		_inRFaddrR = _inBbuf[1];
 		if (_inBbuf[3]==_inRFcount){
+#if defined(debugOn)
 			Serial.print("already:");
 			Serial.println(_inRFcount);
+#endif
+			_inRFdlen=0x00; // nothing new
 		}
-		_inRFcount = _inBbuf[3];
-		_inRFdlen = _inBbuf[4];
+		else{			
+			_inRFcount = _inBbuf[3];
+			_inRFdlen = _inBbuf[4];
+		}
+#if defined(debugOn)
 		for (int i = 0; i < _inBuflen; i++)
 		  {
 			Serial.print(_inBbuf[i], HEX);
 			Serial.print("-");
 		  }
 		  Serial.println("");		
+#endif
 		if (_inRFaddrR == _stationAddress && _inRFaddrE == _gatewayAddress){ // is this gateway the destination ?
 #if defined(debugOn)
 		Serial.println("for me");
