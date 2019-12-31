@@ -8,9 +8,11 @@
 #include <Arduino.h>
 #ifndef rF433Link_h_included
 #define rF433Link_h_included
+
 #define maxDataLen 20
 #define headerLen 5
 #define RFheaderLen 5
+
 typedef struct  {byte *data; uint8_t dataLen;} receivedData;
 class RF433Link
 {

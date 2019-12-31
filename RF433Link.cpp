@@ -44,10 +44,13 @@ void RF433Link::Start()
 	_outMsg[2]=0x00;
 	_outMsg[3]=0x00;
 	vw_set_tx_pin(_senderPin);   // choisir la broche 3 pour émettre
-	vw_set_rx_pin(_reveiverPin);     // choisir la broche 5 pour recevoir
-	//vw_set_ptt_pin(6);     // choisir la broche 6 pour ptt - ajoute suite bug ecriture carte SD
+	if(_reveiverPin!=0xff){
+		vw_set_rx_pin(_reveiverPin);     // choisir la broche 5 pour recevoir
+		}
 	vw_setup(_speedLink);       // vitesse de reception  - tunned pour etre en synch avec le master ??
-	vw_rx_start();        // démarrer la réception	
+	if(_reveiverPin!=0xff){    // do we need to start RF reception
+		vw_rx_start();        // démarrer la réception	
+	}
 }
 void RF433Link::SendData(uint8_t *PData, uint8_t dataLen){
 	dataLen=min(dataLen,maxDataLen);
