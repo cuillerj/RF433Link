@@ -67,6 +67,22 @@ void RF433Link::SendData(uint8_t *PData, uint8_t dataLen){
      _lastSentTime=millis();
 	_retry=0;
 }
+void RF433Link::SendData(uint8_t* PData, uint8_t dataLen,uint8_t routerFlag) {
+	dataLen = min(dataLen, maxDataLen);
+	_outFrameNumber++;
+	_outMsg[2] = routerFlag;
+	_outMsg[3] = _outFrameNumber;
+	for (int i = 0;i < dataLen;i++) {
+		PData++;
+		_outMsg[i + headerLen] = *PData;
+	}
+	_outMsg[4] = dataLen;
+	_outLen = dataLen + headerLen;
+	vw_send((uint8_t*)_outMsg, dataLen + headerLen);
+	vw_wait_tx();
+	_lastSentTime = millis();
+	_retry = 0;
+}
 void RF433Link::RetrySend(){
 	if(millis()>_lastSentTime+random(1500,2500) && _retry < _nbRetry ){
 #if defined(debugOn)
